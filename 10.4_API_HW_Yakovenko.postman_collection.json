@@ -1,0 +1,912 @@
+{
+	"info": {
+		"_postman_id": "6535f386-6735-4b4e-aef5-73c3a5f45ca4",
+		"name": "10.4_API_HW_Yakovenko",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29969162"
+	},
+	"item": [
+		{
+			"name": "Smoke test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response header' field \\\"Content-Type\\\" is equal application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Each property in the response is of the correct type\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('object').that.has.all.keys('passengerId', 'firstName', 'lastName', 'phoneNumber', 'passportNumber', 'email', 'address', 'flightId', 'id');\r",
+							"    pm.expect(jsonData.passengerId).to.be.a('number');\r",
+							"    pm.expect(jsonData.firstName).to.be.a('string');\r",
+							"    pm.expect(jsonData.lastName).to.be.a('string');\r",
+							"    pm.expect(jsonData.phoneNumber).to.be.a('string');\r",
+							"    pm.expect(jsonData.passportNumber).to.be.a('string');\r",
+							"    pm.expect(jsonData.email).to.be.a('string');\r",
+							"    pm.expect(jsonData.address).to.be.a('string');\r",
+							"    pm.expect(jsonData.flightId).to.be.a('number');\r",
+							"    pm.expect(jsonData.id).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response returns the same data from the request\", function () {\r",
+							"     var requestData = JSON.parse(request.data); \r",
+							"     var responseData = pm.response.json();\r",
+							"\r",
+							"     pm.expect(responseData.firstName).to.equal(requestData.firstName);\r",
+							"     pm.expect(responseData.lastName).to.equal(requestData.lastName);\r",
+							"     pm.expect(responseData.phoneNumber).to.equal(requestData.phoneNumber);\r",
+							"     pm.expect(responseData.passportNumber).to.equal(requestData.passportNumber);\r",
+							"     pm.expect(responseData.email).to.equal(requestData.email);\r",
+							"     pm.expect(responseData.address).to.equal(requestData.address);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing the impossibility of duplicate a passenger to the same flight",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response header' field \\\"Content-Type\\\" is equal application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test('Response JSON keys should include timestamp, status, message, details', function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an('object');\r",
+							"    pm.expect(responseJSON).to.include.all.keys('timestamp', 'status', 'message', 'details');\r",
+							"});\r",
+							"\r",
+							"pm.test('Response JSON values for details should be an array and not be null or empty', function () {\r",
+							"    pm.expect(pm.response.json().details).to.be.an('array').and.to.not.be.null.and.to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body has a message about human clones are not allowed on flight\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Unfortunately human clones are not allowed on flight\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing with empty json file",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response header' field \\\"Content-Type\\\" is equal application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test('Response JSON keys should include timestamp, status, message, details', function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an('object');\r",
+							"    pm.expect(responseJSON).to.include.all.keys('timestamp', 'status', 'message', 'details');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body has a message \\\"Validation Failed\\\"\", function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON.message).to.eql(\"Validation Failed\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body has a message about mandatory fields in request JSON\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"firstName | must not be blank\",\r",
+							"        \"address | must not be blank\",\r",
+							"        \"phoneNumber | must not be blank\",\r",
+							"        \"passportNumber | must not be blank\",\r",
+							"        \"lastName | must not be blank\",\r",
+							"        \"email | must not be blank\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"JSON response shouldn't be empty\", function () {\r",
+							"    pm.expect(pm.response.json()).to.be.an('object');\r",
+							"    pm.expect(pm.response.json()).to.not.be.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing with empty body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"  pm.response.to.have.body(\"\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing without some mandatory fields",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response header' field \\\"Content-Type\\\" is equal application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body has a message about mandatory fields in request JSON\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"firstName | must not be blank\")\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing without some value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"  pm.response.to.have.body(\"\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": ,\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing firstName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('First name has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"firstName | must not be blank\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('First Name has one symbol', function () {\r",
+							"    pm.expect(pm.response.json().firstName).to.be.a('string').and.to.have.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"First Name has 300 symbols\", function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJSON).to.be.an('object');\r",
+							"    pm.expect(responseJSON.firstName).to.exist.and.to.have.lengthOf(300);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"First Name has numbers\", function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an('object');\r",
+							"    pm.expect(responseJSON.firstName).to.match(/\\d/);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"First Name has special symbols\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.firstName).to.match(/[!@#$%^&*(),.?\":{}|<>]/, \"First Name should contain special symbols\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing lastName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Last name has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"lastName | must not be blank\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('Last Name has one symbol', function () {\r",
+							"    pm.expect(pm.response.json().lastName).to.be.a('string').and.to.have.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Last Name has 300 symbols\", function () {\r",
+							"    var responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody.lasttName).to.have.lengthOf(300);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Last Name has numbers\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON.lastName).to.match(/\\d/);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Last Name has special symbols\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.lastName).to.match(/[!@#$%^&*(),.?\":{}|<>]/, \"Last Name should contain special symbols\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"+123098766\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing phone number",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Phone number has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"phoneNumber | must not be blank\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('Phone number has one symbol', function () {\r",
+							"    pm.expect(pm.response.json().phoneNumber).to.be.a('string').and.to.have.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Phone number has 30 symbols\", function () {\r",
+							"    var responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody.phoneNumber).to.have.lengthOf(30);\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"(Negative) Phone number has 31 symbols\", function () {\r",
+							"    var responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody.phoneNumber).to.have.lengthOf(31);\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"(Negative) Phone number has letters\", function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(responseJSON.phoneNumber).to.be.a('string').and.to.match(/[a-zA-Z]/, \"Phone number should not contain letters\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"(Negative) Phone number matches +++++ \", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"+++++\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"(Negative)Phone number has special symbols\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(responseData.phoneNumber).to.match(/[!@#$%^&*(),.?\":{}|<>]/);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"123456789\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing passport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Passport number has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Validation Failed\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('Passport number has one symbol', function () {\r",
+							"    pm.expect(pm.response.json().passportNumber).to.be.a('string').and.to.have.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Passport number has 30 symbols\", function () {\r",
+							"    var responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody.passportNumber).to.have.lengthOf(30);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Passport has 31 symbols\", function () {\r",
+							"    var responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody.passportNumber).to.have.lengthOf(31);\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Passport number shouldn't have special symbols\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.passportNumber).to.match(/[!@#$%^&*(+),-.?\":{}|<>]/);\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"3232323232\",\r\n    \"passportNumber\": \"AA11111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test('Email has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"email | must not be blank\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Email has @\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.email).to.match(/@/);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Email has no @\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.email).not.to.match(/@/);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"456456342\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"eef@rf.rr\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testing address",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Address has no symbols', function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"address | must not be blank\");\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('Address has one symbol', function () {\r",
+							"    pm.expect(pm.response.json().address).to.be.a('string').and.to.have.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Address has only special symbols\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.address).to.match(/[!@#$%^&*(),.?\":{}|<>]/);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pswd_adm}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{admin}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Aleksandr\",\r\n    \"lastName\": \"Aleksandroff\",\r\n    \"phoneNumber\": \"12345667\",\r\n    \"passportNumber\": \"AA111111\",\r\n    \"email\": \"aa@aa.aa\",\r\n    \"address\": \"Aleksandria, str.Aleksandrovskaya, 1A-AA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrlForBookRequest}}40",
+					"host": [
+						"{{BaseUrlForBookRequest}}40"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "admin",
+			"value": "john"
+		},
+		{
+			"key": "pswd_adm",
+			"value": "john123",
+			"type": "string"
+		},
+		{
+			"key": "BaseUrlForBookRequest",
+			"value": "http://192.168.40.100:8107/api/v0/flights/book/",
+			"type": "string"
+		},
+		{
+			"key": "agent",
+			"value": "mike",
+			"type": "string"
+		},
+		{
+			"key": "pswd_agnt",
+			"value": "mike123",
+			"type": "string"
+		},
+		{
+			"key": "test_flight_id_47",
+			"value": "47",
+			"disabled": true
+		}
+	]
+}
