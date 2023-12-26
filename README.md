@@ -1,1 +1,1 @@
-Lilia, please download JSON file with corrections.
+Lilia, please, take a homework file with corrections.
